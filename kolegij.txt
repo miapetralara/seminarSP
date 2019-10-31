@@ -1,0 +1,10 @@
+1 Matematika1 7
+2 Fizika1 7
+3 Elektrotehnika 7
+4 UvodURacunalaIprogramiranje 7
+5 EngleskiJezik1 2
+6 Matematika2 7
+7 Fizika2 7
+8 Elektronika 7
+9 Programiranje 7
+10 EngleskiJezik2 2
