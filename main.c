@@ -51,11 +51,14 @@ void PrintStudentList(posST p);
 int tempListKolegij(char *filename, posKO p);
 void PrintKolegijList(posKO p);
 
+posST FindStudent(posST p, int);
+posKO FindKolegij(posKO p, int);
+
 void UnosStudenata(posST);
 void ListKolegij(posST p, posKO q);
 
-int FindStudent(posST p, int);
-int FindKolegij(posKO p, int);
+
+void PrintList(posST p);
 
 int main()
 {
@@ -66,25 +69,29 @@ int main()
     headKO = CreateNodeKO();
 
     char filename[50];
-    printf("Unesite ime datoteke koja sadrzi podatke o studentima\n");
+    printf("Unesite ime datoteke koja sadrzi podatke o studentima:\n");
     scanf("%s", filename);
 
-    //bilo &headST
+
     if(ListStudent(filename, headST))
     {
         printf("\nUspjesno unesena lista studenata.\n");
         PrintStudentList(headST->next);
     }
 
-    printf("Unesite ime datoteke koja sadrzi kolegije\n");
+    printf("\n\nUnesite ime datoteke koja sadrzi kolegije:\n");
     scanf("%s", filename);
 
-    //bilo &headKO
+
     if(tempListKolegij(filename, headKO))
     {
         printf("\nUspjesno unesena lista kolegija.\n");
         PrintKolegijList(headKO->down);
     }
+
+    ListKolegij(headST,headKO);
+    printf("\n\nIspis cijele liste:\n");
+    PrintList(headST->next);
 
     return 0;
 }
@@ -179,14 +186,7 @@ void PrintStudentList(posST p)
     }
 }
 
-void PrintKolegijList(posKO p)
-{
-    while(p!=NULL)
-    {
-        printf("%d %s %d %d\n", p->id_kolegij, p->ime_kolegij, p->ects_kol, p->ocjena);
-        p = p->down;
-    }
-}
+
 
 int tempListKolegij(char *filename, posKO p)
 {
@@ -225,33 +225,97 @@ int tempListKolegij(char *filename, posKO p)
     return 1;
 }
 
+void PrintKolegijList(posKO p)
+{
+    while(p!=NULL)
+    {
+        printf("%d %s %d %d\n", p->id_kolegij, p->ime_kolegij, p->ects_kol, p->ocjena);
+        p = p->down;
+    }
+}
+
+
+
+posST FindStudent(posST p, int st)
+{
+
+    while(p != NULL && st != p ->id_student)
+    {
+        p = p -> next;
+    }
+
+    return p;
+
+}
+
+posKO FindKolegij(posKO p, int ko)
+{
+
+    while(p != NULL && ko != p ->id_kolegij)
+    {
+        p = p -> down;
+    }
+
+    return p;
+
+}
+
 void ListKolegij(posST p, posKO q)
 {
     posST headST = p;
     posKO headKO = q;
     posKO nodeKolegij = NULL;
 
-    FILE *fp = NULL;
-    fp = fopen("polozeno.txt","r");
+    posST tempST = NULL;
+    posKO tempKO = NULL;
 
     int student;
     int kolegij;
     int ocjena;
 
-    posST tempST = NULL;
-    posKO tempKO = NULL;
+    FILE *fp = NULL;
+    fp = fopen("polozeno.txt","r");
 
-    /*while(!feof(fp))
+
+    while(!feof(fp))
     {
-        fscanf("%d %d %d", student, kolegij, ocjena);
-        tempST = FindStudent(headST, student);
-        tempKO = FindKolegij(headKO, kolegij);
+        fscanf(fp, "%d %d %d", &student, &kolegij, &ocjena);
+
+        tempST = FindStudent(headST->next, student);
+        tempKO = FindKolegij(headKO->down, kolegij);
+
         nodeKolegij = CreateNodeKO();
+
         nodeKolegij->id_kolegij = tempKO->id_kolegij;
         strcpy(nodeKolegij->ime_kolegij, tempKO->ime_kolegij);
         nodeKolegij->ects_kol = tempKO->ects_kol;
-        nodeKolegij->down = tempKO->down->down;
-        tempST->down->down = nodeKolegij;
-    }*/
+        nodeKolegij->ocjena = ocjena;
 
+        nodeKolegij->down = tempST->down->down;
+        tempST->down->down = nodeKolegij;
+    }
+
+}
+
+
+void PrintList(posST p)
+{
+    posKO temp = NULL;
+    while(p!=NULL)
+    {
+
+        printf("%d %s %s %d\n", p -> id_student, p -> ime, p -> prezime, p -> god_rod);
+        printf("%g %d %d\n", p -> down -> prosjek, p -> down -> pol_ects, p -> down -> skolarina);
+        temp = p -> down -> down;
+
+
+        while(temp != NULL)
+        {
+            printf("%d %s %d %d", temp->id_kolegij, temp->ime_kolegij, temp->ects_kol, temp->ocjena);
+            temp = temp->down;
+            printf("\n");
+        }
+        printf("---------------------------------------------------------\n");
+       p = p -> next;
+    }
 }
