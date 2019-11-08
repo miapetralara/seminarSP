@@ -56,9 +56,12 @@ posKO FindKolegij(posKO p, int);
 
 void UnosStudenata(posST);
 void ListKolegij(posST p, posKO q);
+//void RacunanjePodataka(posST p);
 
 
 void PrintList(posST p);
+
+int DeleteStudent(posST p);
 
 int main()
 {
@@ -91,7 +94,11 @@ int main()
 
     ListKolegij(headST,headKO);
     printf("\n\nIspis cijele liste:\n");
+
+    //RacunanjePodataka(headST->next);
     PrintList(headST->next);
+
+    DeleteStudent(headST->next);
 
     return 0;
 }
@@ -278,7 +285,7 @@ void ListKolegij(posST p, posKO q)
 
 
     while(!feof(fp))
-    {
+{
         fscanf(fp, "%d %d %d", &student, &kolegij, &ocjena);
 
         tempST = FindStudent(headST->next, student);
@@ -293,9 +300,50 @@ void ListKolegij(posST p, posKO q)
 
         nodeKolegij->down = tempST->down->down;
         tempST->down->down = nodeKolegij;
+
+
     }
 
 }
+
+/*void RacunanjePodataka(posST p)
+{
+  posPO pojedinac = p->down;
+  double tempProsjek = 0;
+  int tempEcts = 0;
+  int skolarina = 400;
+
+  posKO pocetak = pojedinac->down;
+
+  int ectsOcjena = 0;
+  while(p != NULL)
+  {
+
+  while(pocetak != NULL)
+  {
+      tempEcts += pocetak->ects_kol;
+      ectsOcjena += (pocetak->ocjena*pocetak->ects_kol);
+  }
+  tempProsjek = (double)ectsOcjena/tempEcts;
+  pojedinac->prosjek = tempProsjek;
+  pojedinac->pol_ects = tempEcts;
+
+  if(tempEcts >= 55)
+    pojedinac->skolarina = skolarina;
+
+  else if(tempEcts < 55 && tempEcts >= 30)
+  {
+      skolarina += ((60 - tempEcts)*140);
+      pojedinac->skolarina = skolarina;
+  }
+
+  else
+    pojedinac->skolarina = 8400;
+
+    p = p->next;
+}
+
+}*/
 
 
 void PrintList(posST p)
@@ -304,8 +352,8 @@ void PrintList(posST p)
     while(p!=NULL)
     {
 
-        printf("%d %s %s %d\n", p -> id_student, p -> ime, p -> prezime, p -> god_rod);
-        printf("%g %d %d\n", p -> down -> prosjek, p -> down -> pol_ects, p -> down -> skolarina);
+        printf("%d %s %s %d\n", p->id_student, p->ime, p->prezime, p->god_rod);
+        printf("%g %d %d\n", p->down->prosjek, p->down->pol_ects, p->down->skolarina);
         temp = p -> down -> down;
 
 
@@ -315,7 +363,104 @@ void PrintList(posST p)
             temp = temp->down;
             printf("\n");
         }
+
         printf("---------------------------------------------------------\n");
        p = p -> next;
     }
+
+}
+
+int DeleteStudent(posST p)
+{
+    if(p==NULL)
+    {
+        printf("Lista studenata je prazna.\n");
+        return 0;
+    }
+
+    int id_brisanja = 0;
+    char prezime[30];
+    int odabir = 0;
+
+
+    posST PrethodniStudent = NULL;
+    posST TrazeniStudent = NULL;
+    posKO PrviKolZaBrisanje = NULL;
+    posKO PomocniKolZaBrisanje = NULL;
+
+    printf("\n\nOdaberite nacin brisanja:\n 1) po id-u studenta\n 2) po prezimenu studenta:\n\n");
+    scanf("%d", &odabir);
+
+    if(odabir==1)
+    {
+        printf("\nUnesite id studenta kojeg zelite izbrisati: \n");
+        PrintStudentList(p->next);
+        scanf("%d", &id_brisanja);
+
+        PrethodniStudent = p;
+
+        while(PrethodniStudent->next != NULL && PrethodniStudent->next->id_student != id_brisanja)
+        {
+            PrethodniStudent = PrethodniStudent->next;
+        }
+
+        if(PrethodniStudent->next != NULL)
+        {
+            TrazeniStudent = PrethodniStudent->next;
+            PrviKolZaBrisanje = TrazeniStudent->down->down;
+
+            while(PrviKolZaBrisanje != NULL)
+            {
+                PomocniKolZaBrisanje = PrviKolZaBrisanje->down;
+                free(PrviKolZaBrisanje);
+                PrviKolZaBrisanje = PomocniKolZaBrisanje;
+            }
+
+            PrethodniStudent->next = TrazeniStudent->next;
+            free(TrazeniStudent->down);
+            free(TrazeniStudent);
+            printf("\n\nLista studenata nakon brisanja:\n");
+            PrintStudentList(p->next);
+        }
+        else
+            printf("Ne postoji student s unesenim id-em.\n");
+    }
+
+    else if(odabir==2)
+        {
+        printf("\nUnesite prezime studenta kojeg zelite izbrisati: \n");
+        PrintStudentList(p->next);
+        scanf("%s", prezime);
+
+        PrethodniStudent = p;
+
+        while(PrethodniStudent->next != NULL && strcmp(PrethodniStudent->next->prezime,prezime)!=0)
+        {
+            PrethodniStudent = PrethodniStudent->next;
+        }
+
+        if(PrethodniStudent->next != NULL)
+        {
+            TrazeniStudent = PrethodniStudent->next;
+            PrviKolZaBrisanje = TrazeniStudent->down->down;
+
+            while(PrviKolZaBrisanje != NULL)
+            {
+                PomocniKolZaBrisanje = PrviKolZaBrisanje->down;
+                free(PrviKolZaBrisanje);
+                PrviKolZaBrisanje = PomocniKolZaBrisanje;
+            }
+
+            PrethodniStudent->next = TrazeniStudent->next;
+            free(TrazeniStudent->down);
+            free(TrazeniStudent);
+            printf("\n\nLista studenata nakon brisanja:\n");
+            PrintStudentList(p->next);
+            //JOS DODATI FJU AKO SU DVA ISTA PREZ
+        }
+        else
+            printf("Ne postoji student s unesenim prezimenom.\n");
+    }
+
+    return 0;
 }
